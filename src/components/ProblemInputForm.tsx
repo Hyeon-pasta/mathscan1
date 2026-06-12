@@ -76,6 +76,7 @@ export const ProblemInputForm: React.FC<ProblemInputFormProps> = ({
   const [queue, setQueue] = useState<QueuedImage[]>([]);
   const [internalIsAnalyzing, setInternalIsAnalyzing] = useState<boolean>(false);
   const [activeQueueIndex, setActiveQueueIndex] = useState<number | null>(null);
+  const [activeTab, setActiveTab] = useState<'image' | 'text'>('image');
   
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -374,7 +375,7 @@ export const ProblemInputForm: React.FC<ProblemInputFormProps> = ({
   const isAnyFailed = failedCount > 0;
 
   return (
-    <div className="bg-white dark:bg-slate-900 border border-[#D6D0C7] dark:border-slate-800 rounded-3xl shadow-md p-6 overflow-hidden" id="input-container">
+    <div className="bg-white dark:bg-slate-900 border border-[#D6D0C7] dark:border-slate-800 rounded-3xl shadow-md p-5 sm:p-6 overflow-hidden" id="input-container">
       {/* Form Top Control Panel */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6 pb-5 border-b border-[#D6D0C7]/40">
         <div>
@@ -387,11 +388,11 @@ export const ProblemInputForm: React.FC<ProblemInputFormProps> = ({
           </p>
         </div>
         
-        <div className="flex items-center gap-2 flex-wrap">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full md:w-auto">
           <button
             type="button"
             onClick={onLoadSamples}
-            className="flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-semibold text-emerald-800 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-800 rounded-xl hover:bg-emerald-100 dark:hover:bg-emerald-950/60 transition cursor-pointer shadow-xs"
+            className="flex items-center justify-center gap-1.5 px-3.5 py-1.5 text-xs font-semibold text-emerald-800 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-800 rounded-xl hover:bg-emerald-100 dark:hover:bg-emerald-950/60 transition cursor-pointer shadow-xs w-full sm:w-auto"
             id="btn-load-samples"
             title="인프라/네트워크 장애 상황 대비 시연용 로컬 데이터 전송"
           >
@@ -403,7 +404,7 @@ export const ProblemInputForm: React.FC<ProblemInputFormProps> = ({
             <button
               type="button"
               onClick={onClearSamplesOnly}
-              className="flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-semibold text-amber-800 dark:text-amber-400 bg-amber-55/10 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-850 rounded-xl hover:bg-amber-100 dark:hover:bg-amber-950/40 transition cursor-pointer"
+              className="flex items-center justify-center gap-1.5 px-3.5 py-1.5 text-xs font-semibold text-amber-800 dark:text-amber-400 bg-amber-55/10 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-850 rounded-xl hover:bg-amber-100 dark:hover:bg-amber-950/40 transition cursor-pointer w-full sm:w-auto"
               id="btn-clear-samples-only"
               title="등록된 샘플 문제만 목록에서 지우고, 사용자가 업로드한 개별 문항들은 보존합니다."
             >
@@ -416,7 +417,7 @@ export const ProblemInputForm: React.FC<ProblemInputFormProps> = ({
             <button
               type="button"
               onClick={onClearAll}
-              className="flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-semibold text-rose-800 dark:text-rose-300 bg-rose-50 dark:bg-rose-950/30 border border-rose-200 dark:border-rose-800 rounded-xl hover:bg-rose-100 dark:hover:bg-rose-950/60 transition cursor-pointer"
+              className="flex items-center justify-center gap-1.5 px-3.5 py-1.5 text-xs font-semibold text-rose-800 dark:text-rose-300 bg-rose-50 dark:bg-rose-950/30 border border-rose-200 dark:border-rose-800 rounded-xl hover:bg-rose-100 dark:hover:bg-rose-950/60 transition cursor-pointer w-full sm:w-auto"
               id="btn-clear-pool"
             >
               <Trash2 className="w-3.5 h-3.5" />
@@ -426,11 +427,44 @@ export const ProblemInputForm: React.FC<ProblemInputFormProps> = ({
         </div>
       </div>
 
+      {/* 탭 전환 스위쳐 (모바일 및 태블릿에서만 표시, 데스크톱에서는 2개 패널을 대등하게 펼쳐서 표시) */}
+      <div className="lg:hidden flex p-1 bg-stone-100 dark:bg-slate-850 rounded-2xl mb-6 border border-stone-200/30 dark:border-slate-800" id="input-tab-switcher">
+        <button
+          type="button"
+          onClick={() => setActiveTab('image')}
+          className={`flex-1 flex items-center justify-center gap-2 py-2.5 px-3 text-xs font-bold rounded-xl transition-all duration-200 ${
+            activeTab === 'image'
+              ? 'bg-white dark:bg-slate-900 text-[#5A5A40] dark:text-emerald-400 shadow-xs border border-slate-200/10'
+              : 'text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-350'
+          }`}
+        >
+          <ImageIcon className="w-4 h-4 text-indigo-505" />
+          <span>이미지 다중 등록</span>
+          {queue.length > 0 && (
+            <span className="ml-1.5 px-1.5 py-0.5 rounded-full bg-indigo-100 dark:bg-slate-800 text-indigo-700 dark:text-emerald-455 text-[9px] font-black">
+              {queue.length}
+            </span>
+          )}
+        </button>
+        <button
+          type="button"
+          onClick={() => setActiveTab('text')}
+          className={`flex-1 flex items-center justify-center gap-2 py-2.5 px-3 text-xs font-bold rounded-xl transition-all duration-200 ${
+            activeTab === 'text'
+              ? 'bg-white dark:bg-slate-900 text-[#5A5A40] dark:text-emerald-400 shadow-xs border border-slate-200/10'
+              : 'text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-355'
+          }`}
+        >
+          <Sparkles className="w-4 h-4 text-amber-505" />
+          <span>텍스트 키보드 직접 입력</span>
+        </button>
+      </div>
+
       {/* Grid Layout containing Multi-Image upload queue & Text Input side-by-side */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         
         {/* Left Side: Mock Exam Image Analysis (Vision Queue) */}
-        <div className="flex flex-col justify-between border-b lg:border-b-0 lg:border-r border-[#D6D0C7]/40 pb-6 lg:pb-0 lg:pr-8">
+        <div className={`flex-col justify-between lg:border-r border-[#D6D0C7]/40 lg:pr-8 ${activeTab === 'image' ? 'flex' : 'hidden lg:flex'}`}>
           <div>
             <div className="flex justify-between items-center mb-2.5">
               <label className="text-sm font-bold text-[#5A5A40] flex items-center gap-1.5">
@@ -532,12 +566,12 @@ export const ProblemInputForm: React.FC<ProblemInputFormProps> = ({
                     return (
                       <div 
                         key={item.id} 
-                        className={`py-2 px-1.5 flex items-center justify-between gap-3 text-xs ${
+                        className={`py-2 px-1.5 flex items-center justify-between gap-1.5 sm:gap-3 text-xs ${
                           isCurrent || isRetrying ? 'bg-indigo-50/40 dark:bg-slate-800/20 rounded-lg' : ''
                         }`}
                         id={`queue-item-${idx}`}
                       >
-                        <div className="flex items-center gap-2.5 min-w-0 flex-1">
+                        <div className="flex items-center gap-2 sm:gap-2.5 min-w-0 flex-1">
                           {/* Small 1:1 image thumbnail list preview */}
                           <div className="w-10 h-10 rounded-lg overflow-hidden border border-slate-200 shrink-0 bg-stone-100">
                             <img 
@@ -552,7 +586,7 @@ export const ProblemInputForm: React.FC<ProblemInputFormProps> = ({
                             <p className="text-xs font-medium text-slate-800 dark:text-slate-200 truncate" title={item.name}>
                               {item.name}
                             </p>
-                            <p className="text-[10px] text-slate-400 mt-0.5 flex flex-wrap items-center gap-1.5">
+                            <p className="text-[10px] text-slate-400 mt-0.5 flex flex-wrap items-center gap-1 sm:gap-1.5">
                               <span>{formatBytes(item.size)}</span>
                               {isFailed && <span className="text-rose-500 font-semibold">● 최종 분석실패</span>}
                               {isCompleted && <span className="text-emerald-500 font-semibold">● 완료됨 {item.isCached ? '(기존 분석 결과 재사용)' : ''}</span>}
@@ -661,9 +695,9 @@ export const ProblemInputForm: React.FC<ProblemInputFormProps> = ({
               type="button"
               onClick={handleBatchAnalyze}
               disabled={internalIsAnalyzing || queue.length === 0}
-              className={`flex items-center gap-1.5 px-5 py-2.5 text-xs font-bold text-white rounded-xl shadow-xs transition cursor-pointer ${
+              className={`flex items-center justify-center gap-1.5 px-5 py-2.5 text-xs font-bold text-white rounded-xl shadow-xs transition cursor-pointer w-full sm:w-auto ${
                 internalIsAnalyzing || queue.length === 0
-                  ? 'bg-indigo-450/80 opacity-60 cursor-not-allowed'
+                  ? 'bg-indigo-455/85 opacity-60 cursor-not-allowed'
                   : 'bg-indigo-600 hover:bg-indigo-700'
               }`}
               id="btn-image-submit"
@@ -676,7 +710,7 @@ export const ProblemInputForm: React.FC<ProblemInputFormProps> = ({
               ) : (
                 <>
                   <Play className="w-3.5 h-3.5" />
-                  분석 대기열 실행하기 ({queue.filter(q => q.status !== 'completed').length}개 분석)
+                  대기열 실행하기 ({queue.filter(q => q.status !== 'completed').length}개)
                 </>
               )}
             </button>
@@ -684,10 +718,10 @@ export const ProblemInputForm: React.FC<ProblemInputFormProps> = ({
         </div>
 
         {/* Right Side: Text math problem input (Gemini regular text API) */}
-        <form onSubmit={handleTextSubmit} className="flex flex-col justify-between">
+        <form onSubmit={handleTextSubmit} className={`flex-col justify-between ${activeTab === 'text' ? 'flex' : 'hidden lg:flex'}`}>
           <div>
             <div className="flex justify-between items-center mb-2.5">
-              <label htmlFor="problem-text-area" className="text-sm font-bold text-[#5A5A40] flex items-center gap-1.5PP">
+              <label htmlFor="problem-text-area" className="text-sm font-bold text-[#5A5A40] flex items-center gap-1.5">
                 <Trash2 className="w-4 h-4 text-emerald-600 rotate-180" />
                 수학 문제 원본 텍스트 직접 입력하기
               </label>
@@ -712,12 +746,12 @@ export const ProblemInputForm: React.FC<ProblemInputFormProps> = ({
             />
           </div>
 
-          <div className="mt-4 flex gap-2 justify-end">
+          <div className="mt-4 flex gap-2 justify-end w-full sm:w-auto">
             <button
               type="button"
               onClick={() => setText('')}
               disabled={isAnalyzing}
-              className="px-3.5 py-2 text-xs font-semibold text-slate-600 border border-slate-300 rounded-xl hover:bg-slate-100 transition"
+              className="px-3.5 py-2 text-xs font-semibold text-slate-650 border border-slate-300 rounded-xl hover:bg-slate-100 transition w-full sm:w-auto text-center"
               id="btn-clear-text"
             >
               텍스트 비우기
@@ -725,7 +759,7 @@ export const ProblemInputForm: React.FC<ProblemInputFormProps> = ({
             <button
               type="submit"
               disabled={isAnalyzing || !text.trim()}
-              className={`flex items-center gap-1.5 px-5 py-2.5 text-xs font-bold text-white rounded-xl shadow-xs transition cursor-pointer ${
+              className={`flex items-center justify-center gap-1.5 px-5 py-2.5 text-xs font-bold text-white rounded-xl shadow-xs transition cursor-pointer w-full sm:w-auto ${
                 isAnalyzing || !text.trim()
                   ? 'bg-[#5A5A40]/50 opacity-60 cursor-not-allowed'
                   : 'bg-[#5A5A40] hover:bg-[#4A4A35]'
@@ -740,7 +774,7 @@ export const ProblemInputForm: React.FC<ProblemInputFormProps> = ({
               ) : (
                 <>
                   <Sparkles className="w-3.5 h-3.5" />
-                  AI 수학 분석 시작하기
+                  AI 수학 분석 시작
                 </>
               )}
             </button>

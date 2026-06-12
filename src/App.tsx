@@ -119,6 +119,9 @@ export default function App() {
   // Deletion State
   const [deletePending, setDeletePending] = useState<MathProblem | null>(null);
 
+  // Mobile / Tablet Tab Layout State
+  const [mobileViewTab, setMobileViewTab] = useState<'list' | 'detail'>('list');
+
   const [importNotice, setImportNotice] = useState<{
     totalCount: number;
     newCount: number;
@@ -616,6 +619,7 @@ export default function App() {
             existingProblems={problems}
             setImportNotice={setImportNotice}
           />
+        </section>
 
           {/* Import Summary Notice Banner */}
           {importNotice && (
@@ -658,112 +662,137 @@ export default function App() {
                     <p className="text-xs text-slate-600 dark:text-slate-350 mt-1 leading-relaxed">
                       {importNotice.type === 'image' ? '이미지' : '직접 입력한 텍스트'} 분석 결과가 정상 반영되었습니다.{' '}
                       총 <strong className="text-[#5A5A40] dark:text-emerald-400 font-bold">{importNotice.totalCount}개 문항</strong>이 분석 완료되었으며,{' '}
-                      이 중 <strong className="text-emerald-700 dark:text-emerald-450 font-bold">{importNotice.newCount}개 문항이 신규</strong>로 등록되었습니다.{' '}
-                      {importNotice.dupCount > 0 && (
-                        <span>
-                          기존 등록 문제 대비 개념/유형 유사도가 유독 높은 <strong className="text-amber-600 dark:text-amber-450 font-medium">{importNotice.dupCount}개 문항</strong>에는 대시보드 카드 및 상세 뷰어에 중복 가능성 경고 배지가 부착되었습니다.
-                        </span>
-                      )}
+                      이 중 <strong className="text-emerald-700 dark:text-emerald-450 font-bold">{importNotice.newCount}개 문항이 신규</strong> 등록되었습니다.
                     </p>
                   )}
                 </div>
               </div>
               <button
+                type="button"
                 onClick={() => setImportNotice(null)}
-                className="p-1 hover:bg-[#F1EDE8] dark:hover:bg-slate-800 rounded-lg text-slate-400 hover:text-slate-600 transition shrink-0 cursor-pointer"
-                title="닫기"
-                id="btn-close-import-notice"
+                className="p-1 px-2 text-xs font-semibold text-slate-400 hover:text-slate-600 dark:hover:text-slate-350 border border-slate-200 dark:border-slate-800 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-850 cursor-pointer"
               >
-                <X className="w-4 h-4" />
+                닫기
               </button>
             </div>
           )}
-        </section>
 
-        {/* Core Workspace Sections (Only show tables & details if problems exist) */}
-        {problems.length > 0 ? (
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start" id="analysis-workspace-grid">
-            
-            {/* 1. 학습 인사이트 (statistics panel) spanning all 12 columns */}
-            {learningInsights && (
-              <div className="col-span-12 bg-white dark:bg-slate-900 border border-[#D6D0C7] dark:border-slate-800 rounded-3xl p-6 card-shadow" id="learning-insights">
-                <div className="flex items-center gap-2 mb-4 border-b border-[#D6D0C7]/30 pb-3">
-                  <Award className="w-5 h-5 text-amber-655" />
-                  <div>
-                    <h3 className="text-base font-bold text-[#5A5A40] dark:text-slate-100 serif-font italic">실시간 학습 분석 및 취약 유형 인사이트</h3>
-                    <p className="text-[10px] text-[#9A948C]">학습 중인 문항들을 정형 데이터 상태로 일괄 집계한 정보 지표입니다.</p>
-                  </div>
-                </div>
-                
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
-                  {/* Card A: Total Count */}
-                  <div className="bg-[#FDFBF9] dark:bg-slate-950 p-4 rounded-2xl border border-[#D6D0C7]/40 dark:border-slate-800 flex flex-col justify-between shadow-xs">
-                    <span className="text-[10px] uppercase font-bold text-[#9A948C] tracking-wide">총 분석 문제 수</span>
-                    <div className="mt-2 flex items-baseline gap-1">
-                      <span className="text-3xl font-extrabold text-[#5A5A40] dark:text-emerald-450">{learningInsights.total}</span>
-                      <span className="text-xs text-slate-500 font-bold">개 문항</span>
+          {problems.length > 0 ? (
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 pb-20">
+              
+              {/* 1. 학습 인사이트 (statistics panel) spanning all 12 columns */}
+              {learningInsights && (
+                <div className="col-span-12 bg-white dark:bg-slate-900 border border-[#D6D0C7] dark:border-slate-800 rounded-2xl sm:rounded-3xl p-4 sm:p-6 card-shadow" id="learning-insights">
+                  <div className="flex items-center gap-2 mb-4 border-b border-[#D6D0C7]/30 pb-3">
+                    <Award className="w-5 h-5 text-amber-600 dark:text-emerald-400" />
+                    <div>
+                      <h3 className="text-base font-bold text-[#5A5A40] dark:text-slate-100 serif-font italic">실시간 학습 분석 및 취약 유형 인사이트</h3>
+                      <p className="text-[10px] text-[#9A948C]">학습 중인 문항들을 정형 데이터 상태로 일괄 집계한 정보 지표입니다.</p>
                     </div>
                   </div>
                   
-                  {/* Card B: Top Topic */}
-                  <div className="bg-[#FDFBF9] dark:bg-slate-950 p-4 rounded-2xl border border-[#D6D0C7]/40 dark:border-slate-800 flex flex-col justify-between shadow-xs">
-                    <span className="text-[10px] uppercase font-bold text-[#9A948C] tracking-wide">가장 많이 등장한 단원</span>
-                    <div className="mt-2 text-left">
-                      <p className="text-xs font-black text-[#5A5A40] dark:text-slate-200 truncate" title={learningInsights.topTopic}>
-                        {learningInsights.topTopic}
-                      </p>
-                      <p className="text-[9.5px] text-slate-400 mt-1 font-semibold">{learningInsights.topTopicCount}회 집중 출제됨</p>
-                    </div>
-                  </div>
-
-                  {/* Card C: Top Concept */}
-                  <div className="bg-[#FDFBF9] dark:bg-slate-950 p-4 rounded-2xl border border-[#D6D0C7]/40 dark:border-slate-800 flex flex-col justify-between shadow-xs">
-                    <span className="text-[10px] uppercase font-bold text-[#9A948C] tracking-wide">가장 많이 등장한 핵심 개념</span>
-                    <div className="mt-2 text-left">
-                      <p className="text-[11.5px] font-black text-[#5A5A40] dark:text-slate-200 truncate" title={learningInsights.topConcept}>
-                        {learningInsights.topConcept}
-                      </p>
-                      <p className="text-[9.5px] text-slate-400 mt-1 font-semibold">{learningInsights.topConceptCount}회 오답 분석됨</p>
-                    </div>
-                  </div>
-
-                  {/* Card D: Difficulty Distribution */}
-                  <div className="bg-[#FDFBF9] dark:bg-slate-950 p-4 rounded-2xl border border-[#D6D0C7]/40 dark:border-slate-800 flex flex-col justify-between shadow-xs">
-                    <span className="text-[10px] uppercase font-bold text-[#9A948C] tracking-wide">난이도 분포</span>
-                    <div className="mt-1.5 text-left">
-                      <div className="flex gap-2 text-[10px] font-bold">
-                        <span className="text-rose-600">상: {learningInsights.difficulties.high}</span>
-                        <span className="text-amber-600">중: {learningInsights.difficulties.mid}</span>
-                        <span className="text-emerald-600">하: {learningInsights.difficulties.low}</span>
-                      </div>
-                      <div className="flex h-2 bg-slate-100 dark:bg-slate-850 rounded-full overflow-hidden mt-1.5 border border-slate-200/50">
-                        {learningInsights.total > 0 && (
-                          <>
-                            <div className="bg-rose-500 transition-all duration-300" style={{ width: `${(learningInsights.difficulties.high / learningInsights.total) * 100}%` }} />
-                            <div className="bg-amber-500 transition-all duration-300" style={{ width: `${(learningInsights.difficulties.mid / learningInsights.total) * 100}%` }} />
-                            <div className="bg-emerald-500 transition-all duration-300" style={{ width: `${(learningInsights.difficulties.low / learningInsights.total) * 105}%` }} />
-                          </>
-                        )}
+                  <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2.5 sm:gap-4">
+                    {/* Card A: Total Count */}
+                    <div className="bg-[#FDFBF9] dark:bg-slate-950 p-3 sm:p-4 rounded-xl sm:rounded-2xl border border-[#D6D0C7]/40 dark:border-slate-800 flex flex-col justify-between shadow-xs">
+                      <span className="text-[10px] uppercase font-bold text-[#9A948C] tracking-wide">총 분석 문제 수</span>
+                      <div className="mt-2 flex items-baseline gap-1">
+                        <span className="text-2xl sm:text-3xl font-extrabold text-[#5A5A40] dark:text-emerald-450">{learningInsights.total}</span>
+                        <span className="text-[10px] sm:text-xs text-slate-500 font-bold">개 문항</span>
                       </div>
                     </div>
-                  </div>
-
-                  {/* Card E: Potential Duplicates */}
-                  <div className="bg-[#FDFBF9] dark:bg-slate-950 p-4 rounded-2xl border border-[#D6D0C7]/40 dark:border-slate-800 flex flex-col justify-between shadow-xs">
-                    <span className="text-[10px] uppercase font-bold text-[#9A948C] tracking-wide">중복 가능성 문제 개수</span>
-                    <div className="mt-2 flex items-baseline gap-1.5 text-left">
-                      <span className={`text-2xl font-extrabold ${learningInsights.duplicateCount > 0 ? 'text-amber-650' : 'text-slate-400'}`}>
-                        {learningInsights.duplicateCount}
-                      </span>
-                      <span className="text-[10.5px] text-slate-500 font-bold">개 감지</span>
+                    
+                    {/* Card B: Top Topic */}
+                    <div className="bg-[#FDFBF9] dark:bg-slate-950 p-3 sm:p-4 rounded-xl sm:rounded-2xl border border-[#D6D0C7]/40 dark:border-slate-800 flex flex-col justify-between shadow-xs">
+                      <span className="text-[10px] uppercase font-bold text-[#9A948C] tracking-wide">가장 많이 등장한 단원</span>
+                      <div className="mt-2 text-left">
+                        <p className="text-xs font-black text-[#5A5A40] dark:text-slate-200 truncate" title={learningInsights.topTopic}>
+                          {learningInsights.topTopic}
+                        </p>
+                        <p className="text-[9.5px] text-slate-400 mt-1 font-semibold">{learningInsights.topTopicCount}회 집중 출제됨</p>
+                      </div>
+                    </div>
+   
+                    {/* Card C: Top Concept */}
+                    <div className="bg-[#FDFBF9] dark:bg-slate-950 p-3 sm:p-4 rounded-xl sm:rounded-2xl border border-[#D6D0C7]/40 dark:border-slate-800 flex flex-col justify-between shadow-xs">
+                      <span className="text-[10px] uppercase font-bold text-[#9A948C] tracking-wide">가장 많이 등장한 핵심 개념</span>
+                      <div className="mt-2 text-left">
+                        <p className="text-[11.5px] font-black text-[#5A5A40] dark:text-slate-200 truncate" title={learningInsights.topConcept}>
+                          {learningInsights.topConcept}
+                        </p>
+                        <p className="text-[9.5px] text-slate-400 mt-1 font-semibold">{learningInsights.topConceptCount}회 오답 분석됨</p>
+                      </div>
+                    </div>
+   
+                    {/* Card D: Difficulty Distribution */}
+                    <div className="bg-[#FDFBF9] dark:bg-slate-950 p-3 sm:p-4 rounded-xl sm:rounded-2xl border border-[#D6D0C7]/40 dark:border-slate-800 flex flex-col justify-between shadow-xs">
+                      <span className="text-[10px] uppercase font-bold text-[#9A948C] tracking-wide">난이도 분포</span>
+                      <div className="mt-1.5 text-left">
+                        <div className="flex flex-wrap gap-x-1.5 gap-y-0.5 text-[10px] font-bold">
+                          <span className="text-rose-600">상: {learningInsights.difficulties.high}</span>
+                          <span className="text-amber-600">중: {learningInsights.difficulties.mid}</span>
+                          <span className="text-emerald-600">하: {learningInsights.difficulties.low}</span>
+                        </div>
+                        <div className="flex h-2 bg-slate-100 dark:bg-slate-850 rounded-full overflow-hidden mt-1.5 border border-slate-200/50">
+                          {learningInsights.total > 0 && (
+                            <>
+                              <div className="bg-rose-500 transition-all duration-300" style={{ width: `${(learningInsights.difficulties.high / learningInsights.total) * 100}%` }} />
+                              <div className="bg-amber-500 transition-all duration-300" style={{ width: `${(learningInsights.difficulties.mid / learningInsights.total) * 100}%` }} />
+                              <div className="bg-emerald-500 transition-all duration-300" style={{ width: `${(learningInsights.difficulties.low / learningInsights.total) * 105}%` }} />
+                            </>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+   
+                    {/* Card E: Potential Duplicates */}
+                    <div className="bg-[#FDFBF9] dark:bg-slate-950 p-3 sm:p-4 rounded-xl sm:rounded-2xl border border-[#D6D0C7]/40 dark:border-slate-800 flex flex-col justify-between shadow-xs col-span-2 sm:col-span-1">
+                      <span className="text-[10px] uppercase font-bold text-[#9A948C] tracking-wide">중복 가능성 문제 개수</span>
+                      <div className="mt-2 flex items-baseline gap-1.5 text-left">
+                        <span className={`text-2xl font-extrabold ${learningInsights.duplicateCount > 0 ? 'text-amber-655' : 'text-slate-400'}`}>
+                          {learningInsights.duplicateCount}
+                        </span>
+                        <span className="text-[10.5px] text-slate-500 font-bold">개 감지</span>
+                      </div>
                     </div>
                   </div>
                 </div>
+              )}
+
+              {/* Mobile/Tablet tab switcher for List and Detail views spanning all 12 columns */}
+              <div className="lg:hidden col-span-12 flex p-1 bg-[#F1EDE8] dark:bg-slate-850 rounded-2xl border border-[#D6D0C7]/40 dark:border-slate-800/80 mb-2" id="mobile-views-tab-switcher">
+                <button
+                  type="button"
+                  onClick={() => setMobileViewTab('list')}
+                  className={`flex-1 flex items-center justify-center gap-2 py-3 px-3 text-xs font-bold rounded-xl transition-all duration-200 cursor-pointer ${
+                    mobileViewTab === 'list'
+                      ? 'bg-white dark:bg-slate-900 text-[#5A5A40] dark:text-emerald-400 shadow-sm'
+                      : 'text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-350'
+                  }`}
+                >
+                  <Filter className="w-4 h-4 text-[#5A5A40] dark:text-emerald-450" />
+                  <span>진단 목록 ({filteredProblems.length})</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setMobileViewTab('detail')}
+                  className={`flex-1 flex items-center justify-center gap-2 py-3 px-3 text-xs font-bold rounded-xl transition-all duration-200 cursor-pointer ${
+                    mobileViewTab === 'detail'
+                      ? 'bg-white dark:bg-slate-900 text-[#5A5A40] dark:text-emerald-450 shadow-sm'
+                      : 'text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-350'
+                  }`}
+                >
+                  <Sparkles className="w-4 h-4 text-amber-500 shrink-0" />
+                  <span>문항 상세 / 추천</span>
+                  {selectedProblem && (
+                    <span className="px-1.5 py-0.5 rounded bg-[#F1EDE8] dark:bg-slate-850 text-[#5A5A40] dark:text-amber-400 text-[9px] font-extrabold shadow-xs">
+                      #{selectedProblem.problemNumber || selectedProblem.id}
+                    </span>
+                  )}
+                </button>
               </div>
-            )}
             
             {/* Left/Center Part: Analysis Table & Search/Filter (Cols span 8) */}
-            <div className="lg:col-span-8 flex flex-col gap-4">
+            <div className={`lg:col-span-8 flex flex-col gap-4 ${mobileViewTab === 'list' ? 'flex' : 'hidden lg:flex'}`}>
               
               {/* Filter and Search Bar Card */}
               <div className="bg-white dark:bg-slate-900 border border-[#D6D0C7] dark:border-slate-800 rounded-3xl p-5 card-shadow" id="filters-panel">
@@ -875,7 +904,16 @@ export default function App() {
                       return (
                         <div
                           key={prob.id}
-                          onClick={() => setSelectedProblem(prob)}
+                          onClick={() => {
+                            setSelectedProblem(prob);
+                            setMobileViewTab('detail');
+                            setTimeout(() => {
+                              const viewport = document.getElementById('selected-problem-viewport');
+                              if (viewport) {
+                                viewport.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                              }
+                            }, 50);
+                          }}
                           className={`group relative bg-white dark:bg-slate-900 border transition-all duration-300 rounded-2xl overflow-hidden cursor-pointer flex flex-col ${
                             isSelected 
                               ? 'ring-2 ring-[#5A5A40] dark:ring-emerald-400 border-transparent shadow-md transform -translate-y-0.5' 
@@ -993,11 +1031,25 @@ export default function App() {
             </div>
 
             {/* Right Part: Selection Detail & Similarity Recommendation list (Cols span 4) */}
-            <div className="lg:col-span-4 flex flex-col gap-4">
+            <div className={`lg:col-span-4 flex flex-col gap-4 ${mobileViewTab === 'detail' ? 'flex' : 'hidden lg:flex'}`} id="selected-problem-viewport">
               
               {/* Card 1: Selected Math Problem Details */}
               {selectedProblem && (
                 <div className="bg-[#5A5A40] text-stone-50 p-6 rounded-3xl card-shadow border border-[#4A4A35]" id="selection-card">
+                  {/* Mobile Back navigation button */}
+                  <div className="lg:hidden flex items-center justify-between mb-4 pb-3 border-b border-white/10" id="selection-card-mobile-back">
+                    <button
+                      type="button"
+                      onClick={() => setMobileViewTab('list')}
+                      className="inline-flex items-center gap-1 bg-white/10 hover:bg-white/20 text-white font-extrabold rounded-lg px-2.5 py-1 text-[10.5px] border border-white/5 transition-all cursor-pointer shadow-inner"
+                    >
+                      ← 문항 목록·조건 검색으로
+                    </button>
+                    <span className="text-[10px] font-black text-amber-250">
+                      #{selectedProblem.problemNumber || selectedProblem.id} 상세 보기
+                    </span>
+                  </div>
+
                   <div className="flex justify-between items-center mb-4">
                     <span className="text-[10px] font-bold uppercase tracking-widest text-[#F8F5F2]/70 flex items-center gap-1">
                       <Bookmark className="w-3.5 h-3.5 text-amber-300 fill-amber-300" />
@@ -1116,7 +1168,16 @@ export default function App() {
                         <div
                           key={rec.problem.id}
                           className="p-4 bg-[#FDFBF9] dark:bg-slate-950 rounded-2xl border border-[#D6D0C7] dark:border-slate-800 hover:border-[#5A5A40] transition-all duration-200 cursor-pointer shadow-xs hover:shadow-sm"
-                          onClick={() => setSelectedProblem(prob)}
+                          onClick={() => {
+                            setSelectedProblem(prob);
+                            setMobileViewTab('detail');
+                            setTimeout(() => {
+                              const viewport = document.getElementById('selected-problem-viewport');
+                              if (viewport) {
+                                viewport.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                              }
+                            }, 50);
+                          }}
                           id={`recommendation-${prob.id}`}
                         >
                           <div className="flex justify-between items-start mb-2.5">
