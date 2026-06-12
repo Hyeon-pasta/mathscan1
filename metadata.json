@@ -1,0 +1,8 @@
+{
+  "name": "Remix: AI 수학 문제 유형 분석기",
+  "description": "수학 문제를 AI로 유형 분석하고 핵심 개념을 추출하며, 맞춤형 유사 문제를 추천받아 반복 학습할 수 있는 지능형 학습 지원 도구입니다.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
